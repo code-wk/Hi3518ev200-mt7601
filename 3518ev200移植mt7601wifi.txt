@@ -1,0 +1,57 @@
+1.wifi驱动源码编译
+	a.解压压缩包
+	b.进入解压目录，修改Makefile
+		1).增加语句：PLATFORM = HI3518
+		2).增加如下：
+			ifeq ($(PLATFORM),HI3518)
+			#LINUX_SRC = /home/hisi/hi3518/Hi3518_SDK_V1.0.B.0/osdrv/kernel/linux-3.0.y
+			#CROSS_COMPILE = /opt/hisi-linux-nptl/arm-hisiv100-linux/target/bin/arm-hisiv100nptl-linux-
+			LINUX_SRC = /home/hisi/hi3518eV200/Hi3518E_SDK_V1.0.3.0/osdrv/opensource/kernel/linux-3.4.y
+			CROSS_COMPILE = /opt/hisi-linux/x86-arm/arm-hisiv300-linux/target/bin/arm-hisiv300-linux-
+			export ARCH=arm
+			endif
+	c.修改os/linux/config.mk
+		1).增加如下：
+			ifeq ($(PLATFORM),HI3518)
+        			EXTRA_CFLAGS := $(WFLAGS)
+			endif
+
+	d.make,编译成功在os/linux下面会生成mt7601Usta.ko的文件
+
+2.wireless_tools.29（wifi的配置工具）交叉编译
+	a.解压，进入目录
+	b.修改Makefile,如下：
+		ifndef PREFIX
+			PREFIX = /home/hisi/hi3518/mt7601/wifi-tools/Hi3518eV200
+		endif
+
+		## Compiler to use (modify this for cross compile).
+		CC = arm-hisiv300-linux-gcc
+		## Other tools you need to modify for cross compile (static lib only).
+		AR = arm-hisiv300-linux-ar
+		RANLIB = arm-hisiv300-linux-ranlib
+	c.make
+	d.make install
+
+3.移植到开发板
+	a.复制mt7601Usta.ko,以及RT2870STA.dat文件，还有wifi工具生成的文件到开发板上；
+	b.将RT2870STA.dat文件存放在板子/etc/Wireless/RT2870STA/目录下面；
+	c.将wifi工具的sbin目录下的可执行文件放到板子的/bin目录下，方便使用；
+	d.加载wifi的驱动；
+		insmod mt7601Usta.ko;(这里要考虑USB2.0是否正常供电，海思的lowpower.sh默认是将USB2.0的电和时钟关闭了)；
+	e.启动wifi
+		ifconfig ra0 up;
+	f.执行iwlist scan查看可接入的wifi网点；
+	g.连接：
+		接入无密码网点：
+		iwpriv set ra0 NetworkType=Infra
+		iwpriv ra0 set AuthMode=OPEN
+		iwpriv ra0 set EncrypType=NONE
+		iwpriv ra0 set SSID="AP's SSID"
+
+		接入有密码的网点：
+		注意：首先要修改RT2870STA文件，将里面的AuthMode=OPEN和EncrypType=NONE重新设置；
+		然后执行相应的iwprive命令,参考文档iwpriv_usage.txt；
+
+总结：本以为很简单的一个东西，却花费了几天的时间；其实如果硬件上面没有问题，只要按照软件包里面的文档，来操作就能成功了。
+	
