@@ -49,9 +49,12 @@
 		iwpriv ra0 set EncrypType=NONE
 		iwpriv ra0 set SSID="AP's SSID"
 
-		接入有密码的网点：
+		
+		接入有密码的网点：（猜想）->(后面证实想法是错误的)
 		注意：首先要修改RT2870STA文件，将里面的AuthMode=OPEN和EncrypType=NONE重新设置；
 		然后执行相应的iwprive命令,参考文档iwpriv_usage.txt；
 
 总结：本以为很简单的一个东西，却花费了几天的时间；其实如果硬件上面没有问题，只要按照软件包里面的文档，来操作就能成功了。
+
+连接WPA密码的wifi,请参照wifi移植终极版；
 	
