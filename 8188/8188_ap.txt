@@ -1,0 +1,28 @@
+sta模式与mt7601是一样的
+
+1.编译hostapd热点工具
+	a.  	cd  RTL8188EUS_linux_v5.2.2.3_24783.20171031/wpa_supplicant_hostapd/wpa_supplicant_hostapd-0.8_rtw_r24647.20171025/wpa_supplicant_hostapd-0.8_rtw_r24647.20171025/hostapd
+	b.
+		cp .config_bsd .config
+	c.
+		vim .config
+		修改其中的24行，去掉该项CONFIG_DRIVER_NL80211=y前面的“#”
+	d.
+		vim Makefile
+		在第一个条件判断后，增加   CC=arm-hisiv300-linux-gcc(根据自己的编译器修改)
+	e.
+		make
+2.编译dhcp
+		
+
+3.配置热点
+	见ap_start.sh脚本，里面有详细说明
+
+
+
+注：ap与sta只是配置网络的工具不同，其驱动是一样的；
+
+问题：
+1.加载驱动后，直接启动ap模式，产生了热点，但是却外围设备却无法连接
+	原因：因为无法给客户端分配ip地址
+	解决：在ap的板子上面运行，dhcp-server，给连入的设备动态的分配ip地址
